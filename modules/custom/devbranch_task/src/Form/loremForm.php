@@ -98,16 +98,14 @@ class loremForm extends FormBase {
    */
   public function generate(array &$form, FormStateInterface $form_state) {
     $messages = \Drupal::messenger()->messagesByType('error');
+    $response = new AjaxResponse();
     if ($form_state->hasAnyErrors() || !empty($messages)) {
       // If the form has errors, reload it.
-      $response = new AjaxResponse();
-      $url = Url::fromRoute('devbranch_task.form');
-      $path = $url->toString;
-      $response->addCommand(new RedirectCommand($url));
+      $path = \Drupal::routeMatch()->getRouteName();
+      $response->addCommand(new RedirectCommand($path));
       return $response;
     }
     $quantity = $form_state->getValue('quantity');
-    $response = new AjaxResponse();
     // Date options.
     $now = date('m/d/Y h:i:s a', time());
     $time = strtotime($now);
