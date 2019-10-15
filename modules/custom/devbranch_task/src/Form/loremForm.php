@@ -101,9 +101,8 @@ class loremForm extends FormBase {
     $response = new AjaxResponse();
     if ($form_state->hasAnyErrors() || !empty($messages)) {
       // If the form has errors, reload it.
-      $route = 'devbranch_task.form'; // your system route
-      $url = Url::fromRoute($route)->getGeneratedUrl(); // 'cast' to Url 
-      $response->addCommand(new RedirectCommand($url));
+      $host = \Drupal::request()->getHost(); 
+           $response->addCommand(new RedirectCommand($host . '/devbranch-task'));
       return $response;
     }
     $quantity = $form_state->getValue('quantity');
