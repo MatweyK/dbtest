@@ -9,7 +9,7 @@ namespace Drupal\devbranch_task\Form;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 
-class LoremConfigForm extends ConfigFormBase {
+class loremConfigForm extends ConfigFormBase {
 
   /**
    * {@inheritdoc}

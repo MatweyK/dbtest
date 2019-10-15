@@ -11,7 +11,7 @@ use Drupal\Core\Form\FormStateInterface;
 /**
  * Class for lorem form.
  */
-class LoremForm extends FormBase {
+class loremForm extends FormBase {
 
   /**
    * Returns a unique string identifying the form.

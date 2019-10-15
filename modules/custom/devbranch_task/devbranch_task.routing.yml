@@ -1,14 +1,14 @@
 devbranch_task.form:
   path: '/devbranch-task'
   defaults:
-    _form: '\Drupal\devbranch_task\Form\LoremForm'
+    _form: '\Drupal\devbranch_task\Form\loremForm'
   requirements:
     _permission: 'access content'
 
 devbranch_task.config:
   path: '/admin/config/development/devbranch-task'
   defaults:
-    _form: '\Drupal\devbranch_task\Form\LoremConfigForm'
+    _form: '\Drupal\devbranch_task\Form\loremConfigForm'
   requirements:
     _permission: 'access content'
 
