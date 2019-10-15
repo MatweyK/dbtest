@@ -102,7 +102,7 @@ class loremForm extends FormBase {
     if ($form_state->hasAnyErrors() || !empty($messages)) {
       // If the form has errors, reload it.
       $host = \Drupal::request()->getHost(); 
-           $response->addCommand(new RedirectCommand($host . '/devbranch-task'));
+           $response->addCommand(new RedirectCommand('/devbranch-task'));
       return $response;
     }
     $quantity = $form_state->getValue('quantity');
