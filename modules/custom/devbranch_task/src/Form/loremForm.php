@@ -4,14 +4,14 @@ namespace Drupal\devbranch_task\Form;
 
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\HtmlCommand;
+use Drupal\Core\Ajax\RedirectCommand;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\quickedit\Ajax\FieldFormValidationErrorsCommand;
 
 /**
- *
+ * Class for lorem form.
  */
-class loremForm extends FormBase {
+class LoremForm extends FormBase {
 
   /**
    * Returns a unique string identifying the form.
@@ -42,6 +42,8 @@ class loremForm extends FormBase {
     $form['quantity'] = [
       '#title' => $this->t('Chose quantity of words/paragraphs'),
       '#type' => 'number',
+      '#min' => '1',
+      '#max' => '100',
     ];
     $form['type'] = [
       '#type' => 'radios',
@@ -56,7 +58,7 @@ class loremForm extends FormBase {
       ],
     ];
     $form['actions'] = [
-      '#type' => 'button',
+      '#type' => 'submit',
       '#value' => $this->t('Generate'),
       '#ajax' => [
         'callback' => '::generate',
@@ -67,6 +69,19 @@ class loremForm extends FormBase {
       '#markup' => '<div class="result_message"></div>',
     ];
     return $form;
+  }
+
+  /**
+   * Form validation.
+   *
+   * @param array $form
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   */
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+    $quantity = $form_state->getValue('quantity');
+    if (empty($quantity)) {
+      $form_state->setError($form['quantity'], 'quantity field can not be empty');
+    }
   }
 
   /**
@@ -81,24 +96,30 @@ class loremForm extends FormBase {
    *   The form structure.
    */
   public function generate(array &$form, FormStateInterface $form_state) {
+    $messages = \Drupal::messenger()->messagesByType('error');
+    if ($form_state->hasAnyErrors() || !empty($messages)) {
+      // If the form has errors, reload it.
+      $response = new AjaxResponse();
+      $response->addCommand(new RedirectCommand('http://lorem.loc/devbranch-task'));
+      return $response;
+    }
+    $quantity = $form_state->getValue('quantity');
     $response = new AjaxResponse();
     // Date options.
     $now = date('m/d/Y h:i:s a', time());
     $time = strtotime($now);
     // Minus three hours.
     $time = $time - 11400;
-    $beforethreeHours = date('Y-m-d, D H:i:s, M', $time);
+    $beforeThreeHours = date('Y-m-d, D H:i:s, M', $time);
 
     $config = \Drupal::config('devbranch_task.settings');
     $pattern = $config->get('devbranch_task.pattern');
 
-    $renderHtml = '<div>' . 'Generated: ' . $beforethreeHours . '</div>' . '<br>';
-    $quantity = $form_state->getValue('quantity');
+    $renderHtml = '<div>' . 'Generated: ' . $beforeThreeHours . '</div>' . '<br>';
     // If paragraphs.
     if ($form_state->getValue('type') === '0') {
 
       $repertory = explode(PHP_EOL, $pattern);
-      
       $paragraphs = [];
 
       for ($i = 1; $i <= $quantity; $i++) {
@@ -128,7 +149,6 @@ class loremForm extends FormBase {
         $newValue = trim($value, '.,');
         $newRepertory[] = $newValue;
       }
-     
 
       for ($i = 1; $i <= $quantity; $i++) {
         $last_number = 0;
@@ -142,17 +162,15 @@ class loremForm extends FormBase {
       $renderHtml .= ucfirst(trim(mb_strtolower($words))) . ".";
     }
 
-    if ((!empty($quantity)) && (floor($quantity)== $quantity) && ($quantity > 0)) { //////////How to validate in ajax?????
-      $response->addCommand(
+    $response->addCommand(
       new HtmlCommand(
         '.result_message',
         [
           '#type' => 'markup',
-          '#markup' => $renderHtml
+          '#markup' => $renderHtml,
         ]
       )
     );
-    }
     return $response;
   }
 
@@ -167,4 +185,5 @@ class loremForm extends FormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     // TODO: Implement submitForm() method.
   }
+
 }

@@ -9,7 +9,7 @@ namespace Drupal\devbranch_task\Form;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 
-class loremConfigForm extends ConfigFormBase {
+class LoremConfigForm extends ConfigFormBase {
 
   /**
    * {@inheritdoc}
@@ -41,7 +41,9 @@ class loremConfigForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
-
+    if (empty($form_state->getValue('pattern'))) {
+      return $form_state->setError($form['pattern'], 'Can not be empty');
+    }
   }
 
   /**
