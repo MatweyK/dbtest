@@ -103,7 +103,6 @@ class loremForm extends FormBase {
       // If the form has errors, reload it.
       $route = 'devbranch_task.form'; // your system route
       $url = Url::fromRoute($route); // 'cast' to Url 
-      var_dump($url);
       $response->addCommand(new RedirectCommand($url));
       return $response;
     }
