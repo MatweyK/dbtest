@@ -7,6 +7,7 @@ use Drupal\Core\Ajax\HtmlCommand;
 use Drupal\Core\Ajax\RedirectCommand;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Routing;
 
 /**
  * Class for lorem form.
@@ -100,7 +101,7 @@ class loremForm extends FormBase {
     if ($form_state->hasAnyErrors() || !empty($messages)) {
       // If the form has errors, reload it.
       $response = new AjaxResponse();
-      $response->addCommand(new RedirectCommand('http://lorem.loc/devbranch-task'));
+      $response->addCommand(new RedirectCommand(Routing::getRouteByName('devbranch_task.form')));
       return $response;
     }
     $quantity = $form_state->getValue('quantity');
