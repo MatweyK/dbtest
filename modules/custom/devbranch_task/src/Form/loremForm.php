@@ -101,7 +101,7 @@ class loremForm extends FormBase {
     $response = new AjaxResponse();
     if ($form_state->hasAnyErrors() || !empty($messages)) {
       // If the form has errors, reload it.
-      $path = \Drupal::routeMatch()->getRouteName();
+      $path = \Drupal::request()->getRequestUri;
       $response->addCommand(new RedirectCommand($path));
       return $response;
     }
