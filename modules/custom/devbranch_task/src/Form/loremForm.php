@@ -101,9 +101,9 @@ class loremForm extends FormBase {
     if ($form_state->hasAnyErrors() || !empty($messages)) {
       // If the form has errors, reload it.
       $response = new AjaxResponse();
-      $url = Url::fromRoute('devbranch_task.form', [], ['absolute' => TRUE]);
+      $url = Url::fromRoute('devbranch_task.form');
       $path = $url->toString;
-      $response->addCommand(new RedirectCommand($path));
+      $response->addCommand(new RedirectCommand($url));
       return $response;
     }
     $quantity = $form_state->getValue('quantity');
