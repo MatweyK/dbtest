@@ -103,7 +103,7 @@ class loremForm extends FormBase {
       $response = new AjaxResponse();
       $url = Url::fromRoute('devbranch_task.form', [], ['absolute' => TRUE]);
       $path = $url->toString;
-      $response->addCommand(new RedirectCommand($url));
+      $response->addCommand(new RedirectCommand($path));
       return $response;
     }
     $quantity = $form_state->getValue('quantity');
