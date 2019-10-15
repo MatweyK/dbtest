@@ -101,9 +101,11 @@ class loremForm extends FormBase {
     $response = new AjaxResponse();
     if ($form_state->hasAnyErrors() || !empty($messages)) {
       // If the form has errors, reload it.
-      $path = \Drupal::service('path.current')->getPath;
-      $response->addCommand(new RedirectCommand($path));
-      return $response;
+      $route = 'devbranch_task.form'; // your system route
+      $url = Url::fromRoute($route); // 'cast' to Url 
+      $form_state->setRedirectUrl($url); // and redirect
+      // $response->addCommand(new RedirectCommand($path));
+      // return $response;
     }
     $quantity = $form_state->getValue('quantity');
     // Date options.
