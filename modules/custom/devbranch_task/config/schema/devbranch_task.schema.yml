@@ -1,0 +1,11 @@
+devbranch_task.settings:
+  type: config_object
+  label: 'Lorem Ipsum settings'
+  mapping:
+    devbranch_task:
+      type: mapping
+      mapping:
+        pattern:
+          type: text
+          label: 'Source text for lorem ipsum generation:'
+

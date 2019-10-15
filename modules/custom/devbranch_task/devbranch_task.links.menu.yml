@@ -1,0 +1,19 @@
+devbranch_task.admin:
+  title: DevBranch Test
+  route_name: devbranch_task.admin
+  weight: 2
+  menu_name: main
+
+devbranch_task.form:
+  title: 'devbranch_task Lorem generator'
+  description: 'Configure settings for the devbranch_task module.'
+  route_name: devbranch_task.form
+  parent: devbranch_task.admin
+  weight: 3
+
+devbranch_task.config:
+  title: 'devbranch_task settings'
+  description: 'Configure settings for the devbranch_task module.'
+  route_name: devbranch_task.config
+  parent: devbranch_task.admin
+  weight: 4

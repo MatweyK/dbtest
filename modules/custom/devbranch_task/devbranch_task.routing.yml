@@ -1,0 +1,21 @@
+devbranch_task.form:
+  path: '/devbranch-task'
+  defaults:
+    _form: '\Drupal\devbranch_task\Form\loremForm'
+  requirements:
+    _permission: 'access content'
+
+devbranch_task.config:
+  path: '/admin/config/development/devbranch-task'
+  defaults:
+    _form: '\Drupal\devbranch_task\Form\loremConfigForm'
+  requirements:
+    _permission: 'access content'
+
+devbranch_task.admin:
+  path: '/admin/devbranch_task'
+  defaults:
+    _controller: '\Drupal\devbranch_task\Controller\LoremController::get_menu_links'
+    _title: 'devbranch task'
+  requirements:
+    _permission: 'access content'

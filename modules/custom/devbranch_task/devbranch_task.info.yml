@@ -1,0 +1,6 @@
+name: devbranch_task
+type: module
+description: Allows user to generate random words or paragraphs.
+package: test task
+core: 8.x
+configure: devbranch_task.form
