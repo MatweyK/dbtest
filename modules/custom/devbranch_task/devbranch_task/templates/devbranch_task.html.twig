@@ -1,0 +1,17 @@
+{#
+/**
+ * @file
+ * Default theme implementation to print Lorem ipsum text.
+ *
+ * Available variables:
+ *   - source_text
+ *
+ * @ingroup themeable
+ */
+#}
+<div class="devbranch_task">
+  {% for item in source_text %}
+    <div>{{ item }}</div>
+    <br>
+  {% endfor %}
+</div>

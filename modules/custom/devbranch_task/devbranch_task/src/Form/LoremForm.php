@@ -7,12 +7,11 @@ use Drupal\Core\Ajax\HtmlCommand;
 use Drupal\Core\Ajax\RedirectCommand;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Url;
 
 /**
  * Class for lorem form.
  */
-class loremForm extends FormBase {
+class LoremForm extends FormBase {
 
   /**
    * Returns a unique string identifying the form.
@@ -81,7 +80,7 @@ class loremForm extends FormBase {
   public function validateForm(array &$form, FormStateInterface $form_state) {
     $quantity = $form_state->getValue('quantity');
     if (empty($quantity)) {
-      $form_state->setError($form['quantity'], 'quantity field can not be empty');
+      $form_state->setErrorByName('quantity', 'Cant be empty');
     }
   }
 
@@ -98,14 +97,14 @@ class loremForm extends FormBase {
    */
   public function generate(array &$form, FormStateInterface $form_state) {
     $messages = \Drupal::messenger()->messagesByType('error');
-    $response = new AjaxResponse();
     if ($form_state->hasAnyErrors() || !empty($messages)) {
       // If the form has errors, reload it.
-      $host = \Drupal::request()->getHost(); 
-           $response->addCommand(new RedirectCommand('/devbranch-task'));
+      $response = new AjaxResponse();
+      $response->addCommand(new RedirectCommand('http://lorem.loc/devbranch-task'));
       return $response;
     }
     $quantity = $form_state->getValue('quantity');
+    $response = new AjaxResponse();
     // Date options.
     $now = date('m/d/Y h:i:s a', time());
     $time = strtotime($now);
@@ -116,7 +115,54 @@ class loremForm extends FormBase {
     $config = \Drupal::config('devbranch_task.settings');
     $pattern = $config->get('devbranch_task.pattern');
 
-    $renderHtml = '<div>' . 'Generated: ' . $beforeThreeHours . '</div>' . '<br>';
+//    $renderHtml = '<div>' . 'Generated: ' . $beforeThreeHours . '</div>' . '<br>';
+//    // If paragraphs.
+//    if ($form_state->getValue('type') === '0') {
+//
+//      $repertory = explode(PHP_EOL, $pattern);
+//      $paragraphs = [];
+//
+//      for ($i = 1; $i <= $quantity; $i++) {
+//        $thisParagraph = '';
+//        $random_phrases = mt_rand(2, 10);
+//        // don't repeat the last phrase.
+//        $last_number = 0;
+//        $next_number = 0;
+//        for ($j = 1; $j <= $random_phrases; $j++) {
+//          do {
+//            $next_number = floor(mt_rand(0, count($repertory) - 1));
+//          } while ($next_number === $last_number && count($repertory) > 1);
+//          $thisParagraph .= $repertory[$next_number] . ' ';
+//          $last_number = $next_number;
+//        }
+//        $paragraphs[] = $thisParagraph;
+//      }
+//
+//      foreach ($paragraphs as $key => $value) {
+//        $renderHtml .= '<div >' . $value . '</div>' . '<br>';
+//      }
+//    }
+//    else {
+//      $repertory = explode(' ', $pattern);
+//      $words = '';
+//      foreach ($repertory as $key => $value) {
+//        $newValue = trim(trim($value, " "), ".,\t\n\r\0\x0B");
+//        $newRepertory[] = $newValue;
+//      }
+//
+//      for ($i = 1; $i <= $quantity; $i++) {
+//        $last_number = 0;
+//        $next_number = 0;
+//        do {
+//          $next_number = floor(mt_rand(0, count($newRepertory) - 1));
+//        } while ($next_number === $last_number && count($newRepertory) > 1);
+//        $words .= $newRepertory[$next_number] . ' ';
+//        $last_number = $next_number;
+//      }
+//      $renderHtml .= ucfirst(trim(mb_strtolower($words))) . ".";
+//    }
+    $renderHtml['#source_text'] = [];
+    $renderHtml['#source_text'][] = $beforeThreeHours;
     // If paragraphs.
     if ($form_state->getValue('type') === '0') {
 
@@ -140,14 +186,14 @@ class loremForm extends FormBase {
       }
 
       foreach ($paragraphs as $key => $value) {
-        $renderHtml .= '<div >' . $value . '</div>' . '<br>';
+        $renderHtml['#source_text'][] = $value;
       }
     }
     else {
       $repertory = explode(' ', $pattern);
       $words = '';
       foreach ($repertory as $key => $value) {
-        $newValue = trim($value, '.,');
+        $newValue = trim(trim($value, " "), ".,\t\n\r\0\x0B");
         $newRepertory[] = $newValue;
       }
 
@@ -160,16 +206,14 @@ class loremForm extends FormBase {
         $words .= $newRepertory[$next_number] . ' ';
         $last_number = $next_number;
       }
-      $renderHtml .= ucfirst(trim(mb_strtolower($words))) . ".";
+      $renderHtml['#source_text'][] = ucfirst(trim(mb_strtolower($words))) . ".";
     }
+    $renderHtml['#theme'] = 'devbranch_task';
 
     $response->addCommand(
       new HtmlCommand(
         '.result_message',
-        [
-          '#type' => 'markup',
-          '#markup' => $renderHtml,
-        ]
+        $renderHtml
       )
     );
     return $response;

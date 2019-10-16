@@ -32,5 +32,4 @@ class LoremController extends ControllerBase {
     $menu = $menu_tree->build($tree);
     return $menu;
   }
-
 }

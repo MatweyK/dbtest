@@ -9,7 +9,7 @@ namespace Drupal\devbranch_task\Form;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 
-class loremConfigForm extends ConfigFormBase {
+class LoremConfigForm extends ConfigFormBase {
 
   /**
    * {@inheritdoc}
@@ -31,13 +31,13 @@ class loremConfigForm extends ConfigFormBase {
       '#type' => 'textarea',
       '#title' => $this->t('Pattern for lorem ipsum generation:'),
       '#default_value' => $config->get('devbranch_task.pattern'),
-      '#description' => $this->t('Write one sentence per line. Those sentences will be used to generate random text.'),
+      '#description' => $this->t('Write one sentence per line if you want generate paragraphs. Those sentences will be used to generate random text.'),
     );
 
     return $form;
   }
 
-    /**
+  /**
    * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {

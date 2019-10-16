@@ -1,0 +1,15 @@
+<?php
+/**
+ * Implements hook_theme().
+ */
+function devbranch_task_theme($existing, $type, $theme, $path) {
+  $variables = array(
+  'devbranch_task' => array(
+  'variables' => array(
+  'source_text' => NULL,
+  ),
+  'template' => 'devbranch_task',
+  ),
+  );
+  return $variables;
+}
