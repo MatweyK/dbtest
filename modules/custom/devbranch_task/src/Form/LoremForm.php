@@ -3,8 +3,8 @@
 namespace Drupal\devbranch_task\Form;
 
 use Drupal\Core\Ajax\AjaxResponse;
+use Drupal\Core\Ajax\CssCommand;
 use Drupal\Core\Ajax\HtmlCommand;
-use Drupal\Core\Ajax\RedirectCommand;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 
@@ -28,17 +28,11 @@ class LoremForm extends FormBase {
   }
 
   /**
-   * Form constructor.
-   *
-   * @param array $form
-   *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the form.
-   *
-   * @return array
-   *   The form structure.
+   * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
+    // Wrapper for error messages.
+    $form["wrapper"] = ["#markup" => "<div id='test-ajax'></div>"];
     $form['quantity'] = [
       '#title' => $this->t('Chose quantity of words/paragraphs'),
       '#type' => 'number',
@@ -72,16 +66,14 @@ class LoremForm extends FormBase {
   }
 
   /**
-   * Form validation.
-   *
-   * @param array $form
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
     $quantity = $form_state->getValue('quantity');
     if (empty($quantity)) {
-      $form_state->setErrorByName('quantity', 'Cant be empty');
+      $form_state->setErrorByName('quantity', 'quantity field can not be empty');
     }
+    parent::validateForm($form, $form_state);
   }
 
   /**
@@ -96,79 +88,36 @@ class LoremForm extends FormBase {
    *   The form structure.
    */
   public function generate(array &$form, FormStateInterface $form_state) {
-    $messages = \Drupal::messenger()->messagesByType('error');
-    if ($form_state->hasAnyErrors() || !empty($messages)) {
-      // If the form has errors, reload it.
-      $response = new AjaxResponse();
-      $response->addCommand(new RedirectCommand('http://lorem.loc/devbranch-task'));
+    $messages = ['#type' => 'status_messages'];
+    $response = new AjaxResponse();
+    if ($form_state->hasAnyErrors()) {
+      $response->addCommand(new HtmlCommand('#test-ajax', \Drupal::service('renderer')
+        ->renderRoot($messages)));
+      if ($form_state->getError($form['quantity'])) {
+        $fieldCss = [
+          'border' => '1px solid #e62600',
+          'background-color' => 'hsla(15,75%,97%,1)',
+        ];
+        $response->addCommand(new CssCommand('#edit-quantity', $fieldCss));
+      }
       return $response;
     }
     $quantity = $form_state->getValue('quantity');
-    $response = new AjaxResponse();
     // Date options.
-    $now = date('m/d/Y h:i:s a', time());
+    $request_time = \Drupal::time()->getCurrentTime();
+    $now = format_date($request_time, 'custom', 'Y-m-d, H:i:s');
     $time = strtotime($now);
-    // Minus three hours.
+    // Minus three hours 10 min.
     $time = $time - 11400;
-    $beforeThreeHours = date('Y-m-d, D H:i:s, M', $time);
-
+    $beforeThreeHours = format_date($time, 'custom', 'Y-m-d, D H:i:s, M');
     $config = \Drupal::config('devbranch_task.settings');
     $pattern = $config->get('devbranch_task.pattern');
-
-//    $renderHtml = '<div>' . 'Generated: ' . $beforeThreeHours . '</div>' . '<br>';
-//    // If paragraphs.
-//    if ($form_state->getValue('type') === '0') {
-//
-//      $repertory = explode(PHP_EOL, $pattern);
-//      $paragraphs = [];
-//
-//      for ($i = 1; $i <= $quantity; $i++) {
-//        $thisParagraph = '';
-//        $random_phrases = mt_rand(2, 10);
-//        // don't repeat the last phrase.
-//        $last_number = 0;
-//        $next_number = 0;
-//        for ($j = 1; $j <= $random_phrases; $j++) {
-//          do {
-//            $next_number = floor(mt_rand(0, count($repertory) - 1));
-//          } while ($next_number === $last_number && count($repertory) > 1);
-//          $thisParagraph .= $repertory[$next_number] . ' ';
-//          $last_number = $next_number;
-//        }
-//        $paragraphs[] = $thisParagraph;
-//      }
-//
-//      foreach ($paragraphs as $key => $value) {
-//        $renderHtml .= '<div >' . $value . '</div>' . '<br>';
-//      }
-//    }
-//    else {
-//      $repertory = explode(' ', $pattern);
-//      $words = '';
-//      foreach ($repertory as $key => $value) {
-//        $newValue = trim(trim($value, " "), ".,\t\n\r\0\x0B");
-//        $newRepertory[] = $newValue;
-//      }
-//
-//      for ($i = 1; $i <= $quantity; $i++) {
-//        $last_number = 0;
-//        $next_number = 0;
-//        do {
-//          $next_number = floor(mt_rand(0, count($newRepertory) - 1));
-//        } while ($next_number === $last_number && count($newRepertory) > 1);
-//        $words .= $newRepertory[$next_number] . ' ';
-//        $last_number = $next_number;
-//      }
-//      $renderHtml .= ucfirst(trim(mb_strtolower($words))) . ".";
-//    }
     $renderHtml['#source_text'] = [];
     $renderHtml['#source_text'][] = $beforeThreeHours;
     // If paragraphs.
     if ($form_state->getValue('type') === '0') {
-
       $repertory = explode(PHP_EOL, $pattern);
       $paragraphs = [];
-
       for ($i = 1; $i <= $quantity; $i++) {
         $thisParagraph = '';
         $random_phrases = mt_rand(2, 10);
@@ -184,7 +133,6 @@ class LoremForm extends FormBase {
         }
         $paragraphs[] = $thisParagraph;
       }
-
       foreach ($paragraphs as $key => $value) {
         $renderHtml['#source_text'][] = $value;
       }
@@ -196,7 +144,6 @@ class LoremForm extends FormBase {
         $newValue = trim(trim($value, " "), ".,\t\n\r\0\x0B");
         $newRepertory[] = $newValue;
       }
-
       for ($i = 1; $i <= $quantity; $i++) {
         $last_number = 0;
         $next_number = 0;
@@ -209,6 +156,14 @@ class LoremForm extends FormBase {
       $renderHtml['#source_text'][] = ucfirst(trim(mb_strtolower($words))) . ".";
     }
     $renderHtml['#theme'] = 'devbranch_task';
+    if (!empty($messages)) {
+      $response->addCommand(new HtmlCommand('#test-ajax', ''));
+      $fieldCss = [
+        'border' => '1px solid #ccc',
+        'background-color' => '#fff',
+      ];
+      $response->addCommand(new CssCommand('#edit-quantity', $fieldCss));
+    }
 
     $response->addCommand(
       new HtmlCommand(

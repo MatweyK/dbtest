@@ -8,7 +8,6 @@ devbranch_task.form:
   title: 'devbranch_task Lorem generator'
   description: 'Configure settings for the devbranch_task module.'
   route_name: devbranch_task.form
-  # menu_name: 'main'
   parent: devbranch_task.admin
   weight: -10
 
@@ -16,6 +15,5 @@ devbranch_task.config:
   title: 'devbranch_task settings'
   description: 'Configure settings for the devbranch_task module.'
   route_name: devbranch_task.config
-#  menu_name: 'main'
   parent: devbranch_task.admin
   weight: -9

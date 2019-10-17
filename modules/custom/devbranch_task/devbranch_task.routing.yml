@@ -15,7 +15,7 @@ devbranch_task.config:
 devbranch_task.admin:
   path: '/admin/devbranch_task'
   defaults:
-    _controller: '\Drupal\devbranch_task\Controller\LoremController::get_menu_links'
+    _controller: '\Drupal\devbranch_task\Controller\LoremController::getMenuLinks'
     _title: 'devbranch task'
   requirements:
     _permission: 'access content'
