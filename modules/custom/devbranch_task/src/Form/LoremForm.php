@@ -105,11 +105,12 @@ class LoremForm extends FormBase {
     $quantity = $form_state->getValue('quantity');
     // Date options.
     $request_time = \Drupal::time()->getCurrentTime();
-    $now = format_date($request_time, 'custom', 'Y-m-d, H:i:s');
+    $dateFormatter = \Drupal::service('date.formatter');
+    $now = $dateFormatter->format($request_time, 'custom', 'Y-m-d, H:i:s');
     $time = strtotime($now);
     // Minus three hours 10 min.
     $time = $time - 11400;
-    $beforeThreeHours = format_date($time, 'custom', 'Y-m-d, D H:i:s, M');
+    $beforeThreeHours = $dateFormatter->format($time, 'custom', 'Y-m-d, D H:i:s, M');
     $config = \Drupal::config('devbranch_task.settings');
     $pattern = $config->get('devbranch_task.pattern');
     $renderHtml['#source_text'] = [];
