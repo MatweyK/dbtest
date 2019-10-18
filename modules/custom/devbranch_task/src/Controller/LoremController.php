@@ -7,6 +7,7 @@ namespace Drupal\devbranch_task\Controller;
  */
 
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Url;
 
 /**
  * Class for controller.
@@ -20,18 +21,24 @@ class LoremController extends ControllerBase {
    *   Returns menu array to be rendered.
    */
   public function getMenuLinks() {
-    $menu_tree = \Drupal::menuTree();
-    $menu_name = 'main';
+    $build['#source_links'] = [];
+    $build['links']['form'] = [
+      '#title' => $this
+        ->t('Generator'),
+      '#type' => 'link',
+      '#url' => Url::fromRoute('devbranch_task.form'),
+    ];
+    $build['links']['settings'] = [
+      '#title' => $this
+        ->t('Pattern settings'),
+      '#type' => 'link',
+      '#url' => Url::fromRoute('devbranch_task.config'),
+    ];
+    $build['#source_links'][] = $build['links']['form'];
+    $build['#source_links'][] = $build['links']['settings'];
+    $build['#theme'] = 'devbranch_task_menu';
 
-    // Build the typical default set of menu tree parameters.
-    $parameters = $menu_tree->getCurrentRouteMenuTreeParameters($menu_name);
-    $parameters->setMinDepth(2);
-
-    // Load the tree based on this set of parameters.
-    $tree = $menu_tree->load($menu_name, $parameters);
-    // Finally, build a renderable array from the transformed tree.
-    $menu = $menu_tree->build($tree);
-    return $menu;
+    return $build;
   }
 
 }

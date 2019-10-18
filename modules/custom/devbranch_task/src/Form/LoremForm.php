@@ -2,16 +2,60 @@
 
 namespace Drupal\devbranch_task\Form;
 
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\CssCommand;
 use Drupal\Core\Ajax\HtmlCommand;
+use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\RendererInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Class for lorem form.
  */
 class LoremForm extends FormBase {
+
+  /**
+   * @var \Drupal\Core\Datetime\DateFormatterInterface
+   */
+  protected $dateFormatter;
+
+  /**
+   * @var \Drupal\Component\Datetime\TimeInterface
+   */
+  protected $time;
+
+  /**
+   * @var \Drupal\Core\Render\RendererInterface
+   */
+  protected $renderer;
+
+  /**
+   * Class constructor.
+   *
+   * @param \Drupal\Core\Datetime\DateFormatterInterface $dateFormatter
+   * @param \Drupal\Component\Datetime\TimeInterface $time
+   */
+  public function __construct(DateFormatterInterface $dateFormatter, TimeInterface $time, RendererInterface $renderer) {
+    $this->dateFormatter = $dateFormatter;
+    $this->time = $time;
+    $this->renderer = $renderer;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    // Instantiates this form class.
+    return new static(
+    // Load the service required to construct this class.
+      $container->get('date.formatter'),
+      $container->get('datetime.time'),
+      $container->get('renderer')
+    );
+  }
 
   /**
    * Returns a unique string identifying the form.
@@ -91,7 +135,7 @@ class LoremForm extends FormBase {
     $messages = ['#type' => 'status_messages'];
     $response = new AjaxResponse();
     if ($form_state->hasAnyErrors()) {
-      $response->addCommand(new HtmlCommand('#test-ajax', \Drupal::service('renderer')
+      $response->addCommand(new HtmlCommand('#test-ajax', $this->renderer
         ->renderRoot($messages)));
       if ($form_state->getError($form['quantity'])) {
         $fieldCss = [
@@ -104,13 +148,12 @@ class LoremForm extends FormBase {
     }
     $quantity = $form_state->getValue('quantity');
     // Date options.
-    $request_time = \Drupal::time()->getCurrentTime();
-    $dateFormatter = \Drupal::service('date.formatter');
-    $now = $dateFormatter->format($request_time, 'custom', 'Y-m-d, H:i:s');
+    $request_time = $this->time->getCurrentTime();
+    $now = $this->dateFormatter->format($request_time, 'custom', 'Y-m-d, H:i:s');
     $time = strtotime($now);
     // Minus three hours 10 min.
     $time = $time - 11400;
-    $beforeThreeHours = $dateFormatter->format($time, 'custom', 'Y-m-d, D H:i:s, M');
+    $beforeThreeHours = $this->dateFormatter->format($time, 'custom', 'Y-m-d, D H:i:s, M');
     $config = \Drupal::config('devbranch_task.settings');
     $pattern = $config->get('devbranch_task.pattern');
     $renderHtml['#source_text'] = [];
